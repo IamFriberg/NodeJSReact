@@ -9,8 +9,8 @@ var cors = require("cors");
 //Use passport for session and login
 var session = require("express-session");
 var bodyParser = require("body-parser");
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+var passport = require("./config/passport");
+// var LocalStrategy = require('passport-local').Strategy;
 
 
 var indexRouter = require('./routes/index');
@@ -19,7 +19,10 @@ var usersRouter = require('./routes/users');
 var testAPIRouter = require('./routes/testAPI');
 //Require login
 var loginRouter = require('./routes/login');
+//Import the models folder
+var db = require("./models");
 
+// Creating express app and configuring middleware needed for authentication
 var app = express();
 
 // view engine setup
@@ -27,20 +30,20 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 //Use passport for session and login
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);
-    });
-  }
-));
+// passport.use(new LocalStrategy(
+//   function(username, password, done) {
+//     User.findOne({ username: username }, function(err, user) {
+//       if (err) { return done(err); }
+//       if (!user) {
+//         return done(null, false, { message: 'Incorrect username.' });
+//       }
+//       if (!user.validPassword(password)) {
+//         return done(null, false, { message: 'Incorrect password.' });
+//       }
+//       return done(null, user);
+//     });
+//   }
+// ));
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -52,8 +55,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 //Use passport for session and login
 app.use(express.static("public"));
-app.use(session({ secret: "cats" }));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+// We need to use sessions to keep track of our user's login status
+app.use(session({ secret: "keyboard cat", resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -79,6 +84,16 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+//
+//this will listen to and show all activities on our terminal to 
+//let us know what is happening in our app
+// Syncing our database and logging a message to the user upon success
+db.sequelize.sync().then(function() {
+  app.listen(PORT, function() {
+    console.log("==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.", PORT, PORT);
+  });
 });
 
 module.exports = app;
