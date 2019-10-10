@@ -1,69 +1,47 @@
-import React, {Component} from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState }  from "react";
+import { BrowserRouter as Router, Link, Route } from "react-router-dom";
+import PrivateRoute from './PrivateRoute';
+import Home from "./pages/Home";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import { AuthContext } from "./context/auth";
 
-class App extends Component{
+function App(props) {
 
-  constructor(props) {
-    super(props);
-    this.state = { apiResponse: "" };
+  const [authTokens, setAuthTokens] = useState();
+  
+  const setTokens = (data) => {
+    localStorage.setItem("tokens", JSON.stringify(data));
+    setAuthTokens(data);
   }
 
-  callAPI() {
-      fetch('http://localhost:9000/testAPI')
-          .then(res => res.text())
-          .then(res => this.setState({ apiResponse: res }));
-  }
-
-  componentWillMount() {
-      this.callAPI();
-  }
-
-  render() {
-    return (
-      <div className="App">
-        <header className="App-Header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">{this.state.apiResponse}</p>
+  return (
+    <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
+      <Router>
         <div>
-          <form action="http://localhost:9000/login" method="post">
-            <div>
-              <label>Username:</label>
-              <input type="text" name="username"/>
-            </div>
-            <div>
-              <label>Password:</label>
-              <input type="password" name="password"/>
-            </div>
-            <div>
-              <input type="submit" value="Log In"/>
-            </div>
-          </form>
+          <ul>
+            <li>
+              <Link to="/">Home Page</Link>
+            </li>
+            <li>
+              <Link to="/admin">Admin Page</Link>
+            </li>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            <li>
+              <Link to="/signup">Signup</Link>
+            </li>
+          </ul>
+          <Route exact path="/" component={Home} />
+          <Route path="/login" component={Login} />
+          <Route path="/signup" component={Signup} />
+          <PrivateRoute path="/admin" component={Admin} />
         </div>
-      </div>
-    );
-  }
-
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <p>
-  //         Edit <code>src/App.js</code> and save to reload.
-  //       </p>
-  //       <a
-  //         className="App-link"
-  //         href="https://reactjs.org"
-  //         target="_blank"
-  //         rel="noopener noreferrer"
-  //       >
-  //         Learn React
-  //       </a>
-  //     </header>
-  //   </div>
-  // );
+      </Router>
+    </AuthContext.Provider>
+  );
 }
 
 export default App;
