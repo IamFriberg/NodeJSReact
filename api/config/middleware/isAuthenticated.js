@@ -4,6 +4,6 @@ module.exports = function(req, res, next) {
     if (req.user) {
       return next();
     }
-    // If the user isn't' logged in, redirect them to the login page
-    return res.redirect("/");
+    // If the user isn't' logged in, return http unauthorized
+    return res.sendStatus(401);
   };
