@@ -11,6 +11,7 @@ var isAuthenticated = require("../config/middleware/isAuthenticated");
 //
 router.get("/", function(req, res) {
     // If the user already has an account send them to the members page
+    console.log(req.user);
     if (req.user) {
       res.redirect("/members");
     }

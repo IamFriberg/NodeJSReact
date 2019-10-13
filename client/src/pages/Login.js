@@ -18,8 +18,12 @@ function Login(props) {
     axios.post("http://localhost:9000/user/login", {
       email,
       password
+    },{
+      //AxiosRequestConfig parameter
+      withCredentials: true //correct
     }).then(result => {
       if (result.status === 200) {
+        console.log(result);
         setAuthTokens(result.data);
         setLoggedIn(true);
         console.log("User is logged in.");
@@ -31,6 +35,29 @@ function Login(props) {
       console.log(e);
       setIsError(true);
     });
+
+    // axios("http://localhost:9000/user/login", {
+    //   method: "post",
+    //   data: {
+    //     email,
+    //     password
+    //   },
+    //   withCredentials: true
+    // }).then(result => {
+    //   if (result.status === 200) {
+    //     console.log(result);
+    //     setAuthTokens(result.data);
+    //     setLoggedIn(true);
+    //     console.log("User is logged in.");
+    //   } else {
+    //     console.log(result);
+    //     setIsError(true);
+    //   }
+    // }).catch(e => {
+    //   console.log(e);
+    //   setIsError(true);
+    // });
+
   }
 
   if (isLoggedIn) {

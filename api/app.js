@@ -18,7 +18,7 @@ app.use(express.static("public"));
 
 console.log("sessions to keep track of our user's login status");
 // We need to use sessions to keep track of our user's login status
-app.use(session({ secret: "keyboard cat", resave: true, saveUninitialized: true }));
+app.use(session({ secret: 'passport-tutorial', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -31,7 +31,10 @@ var userRouter = require('./routes/user');
 var testAPIRouter = require('./routes/testAPI');
 
 //Add CORS to our API to allow cross-origin requests.
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: "http://localhost:3000"
+  }));
 
 app.use('/', htmlRouter);
 app.use('/', usersRouter);
